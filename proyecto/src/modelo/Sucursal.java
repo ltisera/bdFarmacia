@@ -4,29 +4,22 @@ import java.util.List;
 
 public class Sucursal 
 {
-	private int sucursalId;
 	private Domicilio domicilio;
 	private List<Empleado> empleados;
 	private Empleado encargado;
-	
-	public Sucursal(int sucursalId, Domicilio domicilio, List<Empleado> empleados, Empleado encargado) {
-		super();
-		this.sucursalId = sucursalId;
-		this.domicilio = domicilio;
-		this.empleados = empleados;
-		this.encargado = encargado;
-	}
+	private int numeroTicket;
 
 	public Sucursal() {
 		super();
 	}
 
-	public int getSucursalId() {
-		return sucursalId;
-	}
-
-	public void setSucursalId(int sucursalId) {
-		this.sucursalId = sucursalId;
+	public Sucursal(Domicilio domicilio, List<Empleado> empleados, Empleado encargado,
+			int numeroTicket) {
+		super();
+		this.domicilio = domicilio;
+		this.empleados = empleados;
+		this.encargado = encargado;
+		this.numeroTicket = numeroTicket;
 	}
 
 	public Domicilio getDomicilio() {
@@ -53,10 +46,18 @@ public class Sucursal
 		this.encargado = encargado;
 	}
 
+	public int getNumeroTicket() {
+		return numeroTicket;
+	}
+
+	public void setNumeroTicket(int numeroTicket) {
+		this.numeroTicket = numeroTicket;
+	}
+
 	@Override
 	public String toString() {
-		return "Sucursal [sucursalId=" + sucursalId + ", domicilio=" + domicilio + ", empleados=" + empleados
-				+ ", encargado=" + encargado + "]";
+		return "Sucursal [domicilio=" + domicilio + ", empleados=" + empleados
+				+ ", encargado=" + encargado + ", numeroTicket=" + numeroTicket + "]";
 	}
 	
 	

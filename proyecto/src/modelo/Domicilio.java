@@ -1,18 +1,14 @@
 package modelo;
 
-//import org.bson.Document;
-
 public class Domicilio 
 {
-	private int domicilioId;
 	private String calle;
-	private String numero;
+	private int numero;
 	private String localidad;
 	private String provincia;
 	
-	public Domicilio(int domicilioId, String calle, String numero, String localidad, String provincia) {
+	public Domicilio(String calle, int numero, String localidad, String provincia) {
 		super();
-		this.domicilioId = domicilioId;
 		this.calle = calle;
 		this.numero = numero;
 		this.localidad = localidad;
@@ -23,14 +19,6 @@ public class Domicilio
 		super();
 	}
 
-	public int getDomicilioId() {
-		return domicilioId;
-	}
-
-	public void setDomicilioId(int domicilioId) {
-		this.domicilioId = domicilioId;
-	}
-
 	public String getCalle() {
 		return calle;
 	}
@@ -39,11 +27,11 @@ public class Domicilio
 		this.calle = calle;
 	}
 
-	public String getNumero() {
+	public int getNumero() {
 		return numero;
 	}
 
-	public void setNumero(String numero) {
+	public void setNumero(int numero) {
 		this.numero = numero;
 	}
 
@@ -65,19 +53,7 @@ public class Domicilio
 
 	@Override
 	public String toString() {
-		return "Domicilio [domicilioId=" + domicilioId + ", calle=" + calle + ", numero=" + numero + ", localidad="
+		return "Domicilio [calle=" + calle + ", numero=" + numero + ", localidad="
 				+ localidad + ", provincia=" + provincia + "]";
 	}
-	
-	
-	
-	/*
-	public String toJson() 
-	{
-		Document doc = new Document();
-		return doc.append("calle", calle).append("numero", (numero);
-	}*/
-	
-	
-	
 }

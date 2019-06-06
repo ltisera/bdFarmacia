@@ -2,16 +2,14 @@ package modelo;
 
 public class Producto 
 {
-	private int productoId;
 	private String tipo;
 	private String descripcion;
 	private String laboratorio;
 	private int codigo;
 	private float precio;
 	
-	public Producto(int productoId, String tipo, String descripcion, String laboratorio, int codigo, float precio) {
+	public Producto(String tipo, String descripcion, String laboratorio, int codigo, float precio) {
 		super();
-		this.productoId = productoId;
 		this.tipo = tipo;
 		this.descripcion = descripcion;
 		this.laboratorio = laboratorio;
@@ -21,14 +19,6 @@ public class Producto
 
 	public Producto() {
 		super();
-	}
-
-	public int getProductoId() {
-		return productoId;
-	}
-
-	public void setProductoId(int productoId) {
-		this.productoId = productoId;
 	}
 
 	public String getTipo() {
@@ -73,7 +63,7 @@ public class Producto
 
 	@Override
 	public String toString() {
-		return "Producto [productoId=" + productoId + ", tipo=" + tipo + ", descripcion=" + descripcion
+		return "Producto [tipo=" + tipo + ", descripcion=" + descripcion
 				+ ", laboratorio=" + laboratorio + ", codigo=" + codigo + ", precio=" + precio + "]";
 	}
 	

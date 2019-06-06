@@ -1,35 +1,35 @@
 package modelo;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class Venta 
 {
-	private int ventaId;
 	private LocalDateTime fecha;
 	private int numeroTicket;
 	private float total;
 	private String formaDePago;
-	
-	public Venta(int ventaId, LocalDateTime fecha, int numeroTicket, float total, String formaDePago) {
-		super();
-		this.ventaId = ventaId;
-		this.fecha = fecha;
-		this.numeroTicket = numeroTicket;
-		this.total = total;
-		this.formaDePago = formaDePago;
-	}
+	private List<ProductoVendido> productos;
+	private Empleado empleadoAtendio;
+	private Empleado empleadoCobro;
 
 	public Venta() {
 		super();
 	}
 
-	public int getVentaId() {
-		return ventaId;
+	public Venta(LocalDateTime fecha, int numeroTicket, float total, String formaDePago,
+			List<ProductoVendido> productos, Empleado empleadoAtendio, Empleado empleadoCobro) {
+		super();
+		this.fecha = fecha;
+		this.numeroTicket = numeroTicket;
+		this.total = total;
+		this.formaDePago = formaDePago;
+		this.productos = productos;
+		this.empleadoAtendio = empleadoAtendio;
+		this.empleadoCobro = empleadoCobro;
 	}
 
-	public void setVentaId(int ventaId) {
-		this.ventaId = ventaId;
-	}
+
 
 	public LocalDateTime getFecha() {
 		return fecha;
@@ -63,14 +63,34 @@ public class Venta
 		this.formaDePago = formaDePago;
 	}
 
+	public List<ProductoVendido> getProductos() {
+		return productos;
+	}
+
+	public void setProductos(List<ProductoVendido> productos) {
+		this.productos = productos;
+	}
+
+	public Empleado getEmpleadoAtendio() {
+		return empleadoAtendio;
+	}
+
+	public void setEmpleadoAtendio(Empleado empleadoAtendio) {
+		this.empleadoAtendio = empleadoAtendio;
+	}
+
+	public Empleado getEmpleadoCobro() {
+		return empleadoCobro;
+	}
+
+	public void setEmpleadoCobro(Empleado empleadoCobro) {
+		this.empleadoCobro = empleadoCobro;
+	}
+
 	@Override
 	public String toString() {
-		return "Venta [ventaId=" + ventaId + ", fecha=" + fecha + ", numeroTicket=" + numeroTicket + ", total=" + total
-				+ ", formaDePago=" + formaDePago + "]";
+		return "Venta [fecha=" + fecha + ", numeroTicket=" + numeroTicket + ", total=" + total + ", formaDePago="
+				+ formaDePago + ", productos=" + productos + ", empleadoAtendio=" + empleadoAtendio + ", empleadoCobro="
+				+ empleadoCobro + "]";
 	}
-	
-	
-	
-	
-	
 }
