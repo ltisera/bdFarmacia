@@ -6,7 +6,7 @@ import java.util.List;
 public class Venta 
 {
 	private LocalDateTime fecha;
-	private int numeroTicket;
+	private String numeroTicket;
 	private float total;
 	private String formaDePago;
 	private List<ProductoVendido> productos;
@@ -17,7 +17,7 @@ public class Venta
 		super();
 	}
 
-	public Venta(LocalDateTime fecha, int numeroTicket, float total, String formaDePago,
+	public Venta(LocalDateTime fecha,String numeroTicket, float total, String formaDePago,
 			List<ProductoVendido> productos, Empleado empleadoAtendio, Empleado empleadoCobro) {
 		super();
 		this.fecha = fecha;
@@ -29,8 +29,20 @@ public class Venta
 		this.empleadoCobro = empleadoCobro;
 	}
 
-
-
+	public Venta(LocalDateTime fecha, int numeroTicket, int numeroSucursal, String formaDePago,
+			List<ProductoVendido> productos, Empleado empleadoAtendio, Empleado empleadoCobro) {
+		super();
+		this.fecha = fecha;
+		this.setNumeroTicket(numeroTicket, numeroSucursal);
+		this.formaDePago = formaDePago;
+		this.productos = productos;
+		this.empleadoAtendio = empleadoAtendio;
+		this.empleadoCobro = empleadoCobro;
+		for (ProductoVendido p : productos) {
+			this.total += p.getTotal();
+		}
+	}
+	
 	public LocalDateTime getFecha() {
 		return fecha;
 	}
@@ -39,12 +51,12 @@ public class Venta
 		this.fecha = fecha;
 	}
 
-	public int getNumeroTicket() {
+	public String getNumeroTicket() {
 		return numeroTicket;
 	}
 
-	public void setNumeroTicket(int numeroTicket) {
-		this.numeroTicket = numeroTicket;
+	public void setNumeroTicket(int numeroTicket, int numeroSucursal) {
+		this.numeroTicket = String.format("%04d" , numeroSucursal)+ "-" + String.format("%08d" , numeroTicket);
 	}
 
 	public float getTotal() {

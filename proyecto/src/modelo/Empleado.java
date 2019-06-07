@@ -2,23 +2,23 @@ package modelo;
 
 public class Empleado extends Persona
 {
-	private long cuil;
+	private String cuil;
 
 	public Empleado() {
 		super();
 	}
 
 	public Empleado(String apellido, String nombre, int dni, Domicilio domicilio, String obraSocial, int numeroAfiliado,
-			long cuil) {
+			String cuil) {
 		super(apellido, nombre, dni, domicilio, obraSocial, numeroAfiliado);
 		this.cuil = cuil;
 	}
 
-	public long getCuil() {
+	public String getCuil() {
 		return cuil;
 	}
 
-	public void setCuil(long cuil) {
+	public void setCuil(String cuil) {
 		this.cuil = cuil;
 	}
 

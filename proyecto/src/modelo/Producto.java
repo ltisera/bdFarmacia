@@ -66,6 +66,21 @@ public class Producto
 		return "Producto [tipo=" + tipo + ", descripcion=" + descripcion
 				+ ", laboratorio=" + laboratorio + ", codigo=" + codigo + ", precio=" + precio + "]";
 	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Producto other = (Producto) obj;
+		if (codigo != other.codigo)
+			return false;
+		return true;
+	}
 	
 	
 	
