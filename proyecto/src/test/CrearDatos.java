@@ -9,9 +9,9 @@ import com.mongodb.client.MongoDatabase;
 import modelo.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Random;
 
@@ -38,9 +38,11 @@ public class CrearDatos {
 			
 			List<String> nombres = new ArrayList<>(Arrays.asList("Alejandra", "Alex", "Candela", "Cristian", "Delia", "Diego", "Eugenia", "Fabio", "Federico", "Gabriel", "Juan", "Juana", "Jose", "Leandro", "Luis", "Marcos", "Oscar", "Pedro", "Rita", "Sandra", "Tomas", "Valeria"));
 			List<String> apellidos = new ArrayList<>(Arrays.asList("Alonso", "Alvarez", "Blanco", "Diaz", "Fernandez", "Garcia", "Gomez", "Gonzales", "Gutierrez", "Hernandez", "Jimenez", "Lopez", "Martinez", "Moreno", "Muñoz", "Perez", "Rodriguez", "Ruiz", "Sanchez", "Santos", "Torres", "Vazquez"));
+			List<String> obrasSociales = new ArrayList<>(Arrays.asList("Pami", "OSDE", "Privado"));
 			
 			List<Sucursal> lstSucursales = new ArrayList();
 			List<Producto> lstProductos = new ArrayList();
+			List<Cliente> lstClientes = new ArrayList();
 			
 			int clientes = 10;
 			int sucursales = 3;
@@ -62,11 +64,12 @@ public class CrearDatos {
 				String nombre = nombres.remove(rand.nextInt(nombres.size()));
 				int dni = 40805000 + (i * 10) + i;
 				Domicilio dom = new Domicilio("calle" + i, 110 + i, "Localidad", "Buenos Aires");
-				String obraSocial = "Osde";
+				String obraSocial = obrasSociales.get(rand.nextInt(obrasSociales.size()));
 				int nroAfiliado = i;
 				Cliente cliente = new Cliente(apellido, nombre, dni, dom, obraSocial, nroAfiliado);
 				Document doc = Document.parse(mapper.writeValueAsString(cliente));
 				collectionCliente.insertOne(doc);
+				lstClientes.add(cliente);
 			}
 			System.out.print("completado.\n");
 			
@@ -133,7 +136,8 @@ public class CrearDatos {
 				for(int i = 0; i < (ventasXsucursal - variacion + rand.nextInt((variacion * 2) + 1)); i++) {
 					Empleado empleadoAtendio = s.getEmpleados().get(rand.nextInt(s.getEmpleados().size()));
 					Empleado empleadoCobro = s.getEmpleados().get(rand.nextInt(s.getEmpleados().size()));
-					LocalDateTime fecha = LocalDateTime.now();
+					Cliente cliente = lstClientes.get(rand.nextInt(lstClientes.size()));
+					GregorianCalendar fecha = new GregorianCalendar();
 					String formaDePago = "";
 					int opc = rand.nextInt(3);
 					if(opc == 0) {
@@ -164,7 +168,7 @@ public class CrearDatos {
 						}
 					}
 				
-					Venta venta = new Venta(fecha, nroTicket, s.getNumeroTicket(), formaDePago, lstProductoVendido, empleadoAtendio, empleadoCobro);
+					Venta venta = new Venta(fecha, nroTicket, s.getNumeroTicket(), formaDePago, lstProductoVendido, empleadoAtendio, empleadoCobro, cliente);
 					Document doc = Document.parse(mapper.writeValueAsString(venta));
 					collectionVenta.insertOne(doc);
 				}

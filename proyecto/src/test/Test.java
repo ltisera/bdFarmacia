@@ -10,12 +10,14 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Projections;
 
 import modelo.*;
 
@@ -28,7 +30,7 @@ public class Test {
 		
 		System.out.println("conectado");
 		
-		traerClientesQueContengan(db, "a");
+		traerClientesQueContengan(db, "e");
 		contVentasXSucursal(db);
 		
 		
@@ -39,6 +41,7 @@ public class Test {
 		MongoCollection<Document> collection = db.getCollection("Sucursales");
 		
 		List<Sucursal> sucursales = new ArrayList();
+		List<Venta> ventas = new ArrayList();
 		
 	    ObjectMapper mapper = new ObjectMapper();
 	    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -52,11 +55,25 @@ public class Test {
 			} finally {
 			    cursor.close();
 			}
-			collection = db.getCollection("Ventas");
-			for(Sucursal s : sucursales) {
+			
+			/*for(Sucursal s : sucursales) {
 				System.out.print("\nSucursal " + s.getNumeroTicket() + " vendio: ");
 				Bson filtro = Filters.regex("numeroTicket", String.format("%04d-.*", s.getNumeroTicket()));
 				System.out.print(collection.countDocuments(filtro));
+			}
+			*/
+
+			MongoCollection<Document> collectionV = db.getCollection("Ventas");
+			MongoCursor<Document> cursorV = collectionV.find().projection(Projections.exclude("fecha")).iterator();
+			try {
+			    while (cursorV.hasNext()) {
+			    	ventas.add(mapper.readValue(cursorV.next().toJson(), Venta.class));
+			    }
+			} finally {
+			    cursorV.close();
+			}
+			for(Venta v : ventas) {
+				System.out.println(v);
 			}
 	    }
 		catch (JsonParseException e) { e.printStackTrace();}

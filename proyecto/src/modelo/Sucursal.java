@@ -8,6 +8,7 @@ public class Sucursal
 	private List<Empleado> empleados;
 	private Empleado encargado;
 	private int numeroTicket;
+	private List<Venta> ventas;
 
 	public Sucursal() {
 		super();
@@ -52,6 +53,14 @@ public class Sucursal
 
 	public void setNumeroTicket(int numeroTicket) {
 		this.numeroTicket = numeroTicket;
+	}
+
+	public List<Venta> getVentas() {
+		return ventas;
+	}
+
+	public void setVentas(List<Venta> ventas) {
+		this.ventas = ventas;
 	}
 
 	@Override

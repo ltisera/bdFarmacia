@@ -2,8 +2,11 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="C:/Users/Mateus/Desktop/bson-3.10.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Mateus/Desktop/mongodb-driver-3.10.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Mateus/Desktop/mongodb-driver-core-3.10.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Camila/Documents/GitHub/bdFarmacia/proyecto/Libraries/bson-3.10.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Camila/Documents/GitHub/bdFarmacia/proyecto/Libraries/jackson-databind-2.9.9.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Camila/Documents/GitHub/bdFarmacia/proyecto/Libraries/mongodb-driver-core-3.10.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Camila/Documents/GitHub/bdFarmacia/proyecto/Libraries/mongodb-driver-sync-3.10.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Camila/Documents/GitHub/bdFarmacia/proyecto/Libraries/jackson-annotations-2.9.9.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Camila/Documents/GitHub/bdFarmacia/proyecto/Libraries/jackson-core-2.9.9.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

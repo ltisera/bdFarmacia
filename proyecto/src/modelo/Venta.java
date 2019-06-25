@@ -1,24 +1,25 @@
 package modelo;
 
-import java.time.LocalDateTime;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 public class Venta 
 {
-	private LocalDateTime fecha;
+	private GregorianCalendar fecha;
 	private String numeroTicket;
 	private float total;
 	private String formaDePago;
 	private List<ProductoVendido> productos;
 	private Empleado empleadoAtendio;
 	private Empleado empleadoCobro;
+	private Cliente cliente;
 
 	public Venta() {
 		super();
 	}
 
-	public Venta(LocalDateTime fecha,String numeroTicket, float total, String formaDePago,
-			List<ProductoVendido> productos, Empleado empleadoAtendio, Empleado empleadoCobro) {
+	public Venta(GregorianCalendar fecha,String numeroTicket, float total, String formaDePago,
+			List<ProductoVendido> productos, Empleado empleadoAtendio, Empleado empleadoCobro, Cliente cliente) {
 		super();
 		this.fecha = fecha;
 		this.numeroTicket = numeroTicket;
@@ -27,10 +28,11 @@ public class Venta
 		this.productos = productos;
 		this.empleadoAtendio = empleadoAtendio;
 		this.empleadoCobro = empleadoCobro;
+		this.cliente = cliente;
 	}
 
-	public Venta(LocalDateTime fecha, int numeroTicket, int numeroSucursal, String formaDePago,
-			List<ProductoVendido> productos, Empleado empleadoAtendio, Empleado empleadoCobro) {
+	public Venta(GregorianCalendar fecha, int numeroTicket, int numeroSucursal, String formaDePago,
+			List<ProductoVendido> productos, Empleado empleadoAtendio, Empleado empleadoCobro, Cliente cliente) {
 		super();
 		this.fecha = fecha;
 		this.setNumeroTicket(numeroTicket, numeroSucursal);
@@ -38,16 +40,17 @@ public class Venta
 		this.productos = productos;
 		this.empleadoAtendio = empleadoAtendio;
 		this.empleadoCobro = empleadoCobro;
+		this.cliente = cliente;
 		for (ProductoVendido p : productos) {
 			this.total += p.getTotal();
 		}
 	}
 	
-	public LocalDateTime getFecha() {
+	public GregorianCalendar getFecha() {
 		return fecha;
 	}
 
-	public void setFecha(LocalDateTime fecha) {
+	public void setFecha(GregorianCalendar fecha) {
 		this.fecha = fecha;
 	}
 
@@ -97,6 +100,14 @@ public class Venta
 
 	public void setEmpleadoCobro(Empleado empleadoCobro) {
 		this.empleadoCobro = empleadoCobro;
+	}
+
+	public Cliente getCliente() {
+		return cliente;
+	}
+
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
 	}
 
 	@Override
