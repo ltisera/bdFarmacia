@@ -116,8 +116,7 @@ public class Consultas {
 			Bson filtro = eq("productos.producto.tipo", "Medicamento");
 			Bson unwind = new BasicDBObject("$unwind","$productos");
 			Bson group = group("$productos.producto.codigo", first("etipo","$productos.producto.tipo"), first("enumeroTicket", "$numeroTicket"), first("eproducto","$productos.producto"), push("ecantidad", "$productos.cantidad"), first("eprecio","$productos.precio"), push("etotal", "$productos.total"));
-			Bson projection = project(fields(Arrays.asList(new BasicDBObject("producto","$eproducto"),sum("cantidad", "$ecantidad"),new BasicDBObject("precio","$eprecio"), sum("total", "$etotal"))));
-			
+			Bson projection = project(fields(Arrays.asList(new BasicDBObject("producto","$eproducto"),new BasicDBObject("cantidad", new BasicDBObject("$sum", "$ecantidad")),new BasicDBObject("precio","$eprecio"), new BasicDBObject("total", new BasicDBObject("$sum", "$etotal")))));
 			for(Sucursal s : sucursales) {
 				List<Venta> ventas = new ArrayList();
 				Bson sucursal = regex("numeroTicket", String.format("%04d-.*", s.getNumeroTicket()));
