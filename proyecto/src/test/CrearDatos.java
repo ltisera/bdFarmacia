@@ -151,7 +151,7 @@ public class CrearDatos {
 					
 					List<ProductoVendido> lstProductoVendido = new ArrayList();
 					for(int j = 0; j < rand.nextInt(productosXventa + 3) + 1; j++) {
-						Producto producto = lstProductos.get(rand.nextInt(s.getEmpleados().size()));
+						Producto producto = lstProductos.get(rand.nextInt(lstProductos.size()));
 						boolean estaEnLista = false;
 						int n = 0;
 						while(j>0 && n < lstProductoVendido.size() && !estaEnLista) {
