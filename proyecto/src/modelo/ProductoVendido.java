@@ -64,8 +64,8 @@ public class ProductoVendido {
 
 	@Override
 	public String toString() {
-		return "ProductoVendido [producto=" + producto.getDescripcion() + ", cantidad=" + cantidad + ", precio=" + precio + ", total="
-				+ total + "]";
+		return "producto=" + producto.getDescripcion() + ", cantidad=" + cantidad + ", precio=" + precio + ", total="
+				+ total;
 	}
 	
 	public float round(float d, int decimalPlace) {

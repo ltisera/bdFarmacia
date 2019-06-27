@@ -112,8 +112,8 @@ public class Venta
 
 	@Override
 	public String toString() {
-		return "Venta [fecha=" + fecha + ", numeroTicket=" + numeroTicket + ", total=" + total + ", formaDePago="
-				+ formaDePago + ", productos=" + productos + ", empleadoAtendio=" + empleadoAtendio + ", empleadoCobro="
-				+ empleadoCobro + "]";
+		return "fecha=" + fecha + ", numeroTicket=" + numeroTicket + ", total=" + total + ", formaDePago="
+				+ formaDePago + ", productos=" + productos + ", empleadoAtendio=" + empleadoAtendio.getCuil() + ", empleadoCobro="
+				+ empleadoCobro.getCuil();
 	}
 }

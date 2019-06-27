@@ -1,5 +1,6 @@
 package test;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,277 +35,243 @@ public class Consultas {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		//Consulta1(new GregorianCalendar(), new GregorianCalendar());  //Falta entre fechas
-		//Consulta2("OSDE", new GregorianCalendar(), new GregorianCalendar()); //Falta entre fechas
-		//Consulta3("Tarjeta", new GregorianCalendar(), new GregorianCalendar()); //Falta entre fechas
-		Consulta4(new GregorianCalendar(), new GregorianCalendar());  //HELP
-		//Consulta5();   //HELP
-		//Consulta6();   //HELP
-		//Consulta7();	 //Falta entre fechas
-		//Consulta8();	 //Falta entre fechas
+		//consulta1(new GregorianCalendar(), new GregorianCalendar());  //Falta entre fechas
+		//consulta2("OSDE", new GregorianCalendar(), new GregorianCalendar()); //Falta entre fechas
+		//consulta3("Tarjeta", new GregorianCalendar(), new GregorianCalendar()); //Falta entre fechas
+		//consulta4(new GregorianCalendar(), new GregorianCalendar());  //Falta entre fechas
+		//consulta5();   //HELP
+		//consulta6();   //HELP
+		consulta7();	 //Falta entre fechas
+		//consulta8();	 //Falta entre fechas
 	}
 	
 	
 	//1. Detalle y totales de ventas para la cadena completa y por sucursal, entre fechas.
-	private static void Consulta1(GregorianCalendar desde, GregorianCalendar hasta) {
+	private static void consulta1(GregorianCalendar desde, GregorianCalendar hasta) {
 		List<Bson> filtros = new ArrayList();
 		//filtros.add(gte("fecha", desde));
 		//filtros.add(lte("fecha", hasta));
-		VentasxSucursal(filtros);
+		ventasxSucursal(filtros, null);
 	}
 	
 	//2. Detalle y totales de ventas para la cadena completa y por sucursal, por obra social o privados entre fechas.
-	private static void Consulta2(String obraSocial, GregorianCalendar desde, GregorianCalendar hasta) {
+	private static void consulta2(String obraSocial, GregorianCalendar desde, GregorianCalendar hasta) {
 		List<Bson> filtros = new ArrayList();
 		//filtros.add(gte("fecha", desde));
 		//filtros.add(lte("fecha", hasta));
-		filtros.add(eq("cliente.obraSocial", obraSocial));
-		VentasxSucursal(filtros);
+		filtros.add(match(eq("cliente.obraSocial", obraSocial)));
+		ventasxSucursal(filtros, "tipo obra social: " + obraSocial);
 	}
 	
 	//3. Detalle y totales de cobranza para la cadena completa y por sucursal, por medio de pago y entre fechas.
-	private static void Consulta3(String medioPago, GregorianCalendar desde, GregorianCalendar hasta) {
+	private static void consulta3(String medioPago, GregorianCalendar desde, GregorianCalendar hasta) {
 		List<Bson> filtros = new ArrayList();
 		//filtros.add(gte("fecha", desde));
 		//filtros.add(lte("fecha", hasta));
-		filtros.add(eq("formaDePago", medioPago));
-		VentasxSucursal(filtros);
+		filtros.add(match(eq("formaDePago", medioPago)));
+		ventasxSucursal(filtros, "forma de pago: " + medioPago);
 	}
 	
-	//4. Detalle y totales de ventas de productos, total de la cadena y por sucursal, entre fechas, diferenciados entre farmacia y perfumería.	
-	/*
-	db.getCollection('Ventas').aggregate([
-        {$unwind: "$productos"}, 
-        {$match: {'productos.producto.tipo': "Medicamento"}},
-        {$group: {
-            '_id': "$productos.producto.codigo",
-            'eproducto': {$first: "$productos.producto"},
-            'ecantidad': {$push: "$productos.cantidad"},
-            'eprecio': {$first: "$productos.precio"},
-            'etotal': {$push: "$productos.total"}
-        }},
-        {$project: {
-            "producto" : "$eproducto",
-            "cantidad" : {$sum: "$ecantidad"},
-            "precio" : "$eprecio",
-            "total" : {$sum: "$etotal"}
-        }}     
-	])
-	*/
-	private static void Consulta4(GregorianCalendar desde, GregorianCalendar hasta) {
-		MongoClient mongoClient = MongoClients.create();
-		MongoDatabase db = mongoClient.getDatabase("test");
-		
-		MongoCollection<Document> collSucursales = db.getCollection("Sucursales");
-		MongoCollection<Document> collVentas = db.getCollection("Ventas");
-		
-		List<Sucursal> sucursales = new ArrayList();
-		List<ProductoVendido> productosVendidos = new ArrayList();
-		
-	    ObjectMapper mapper = new ObjectMapper();
-	    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-	    
-	    try{
-			MongoCursor<Document> curSucursales = collSucursales.find().iterator();
-			try {
-			    while (curSucursales.hasNext()) {
-			    	sucursales.add(mapper.readValue(curSucursales.next().toJson(), Sucursal.class));
-			    }
-			} finally {
-			    curSucursales.close();
-			}
-			Bson filtro = eq("productos.producto.tipo", "Medicamento");
-			Bson unwind = new BasicDBObject("$unwind","$productos");
-			Bson group = group("$productos.producto.codigo", first("etipo","$productos.producto.tipo"), first("enumeroTicket", "$numeroTicket"), first("eproducto","$productos.producto"), push("ecantidad", "$productos.cantidad"), first("eprecio","$productos.precio"), push("etotal", "$productos.total"));
-			Bson projection = project(fields(Arrays.asList(new BasicDBObject("producto","$eproducto"),new BasicDBObject("cantidad", new BasicDBObject("$sum", "$ecantidad")),new BasicDBObject("precio","$eprecio"), new BasicDBObject("total", new BasicDBObject("$sum", "$etotal")))));
-			for(Sucursal s : sucursales) {
-				List<Venta> ventas = new ArrayList();
-				Bson sucursal = regex("numeroTicket", String.format("%04d-.*", s.getNumeroTicket()));
-				
-				MongoCursor<Document> curVentas = collVentas.aggregate(Arrays.asList(unwind, group, projection)).iterator();
-
-				System.out.println("Detalle de ventas de la sucursal " + s.getNumeroTicket());
-				try {
-				    while (curVentas.hasNext()) {
-				    	System.out.println(curVentas.next().toJson());
-				    	//ventas.add(mapper.readValue(curVentas.next().toJson(), Venta.class));
-				    }
-				} finally {
-					curVentas.close();
-					//s.setVentas(ventas);
-				}
-			}
-			/*
-			float totalCadena = 0;
-			for(Sucursal s : sucursales) {
-				float totalSucursal = 0;
-				System.out.println("Detalle de ventas de la sucursal " + s.getNumeroTicket());
-				for(Venta v : s.getVentas()) {
-					System.out.println(v);
-					totalSucursal += v.getTotal();
-				}
-				System.out.println("Ventas totales de la sucursal " + s.getNumeroTicket() + ": " + totalSucursal + "\n");
-				totalCadena += totalSucursal;
-			}
-			System.out.println("Ventas totales de la cadena: " + totalCadena);
-			*/
-			
-	    }
-		catch (JsonParseException e) { e.printStackTrace();}
-	    catch (JsonMappingException e) { e.printStackTrace(); }
-	    catch (Exception e) { e.printStackTrace(); }
+	//4. Detalle y totales de ventas de productos, total de la cadena y por sucursal, entre fechas, diferenciados entre farmacia y perfumería.
+	private static void consulta4(GregorianCalendar desde, GregorianCalendar hasta) {
+		ventaxProducto("Medicamento");
+		System.out.println("");
+		ventaxProducto("Perfumeria");
 	}
 
 	//5. Ranking de ventas de productos, total de la cadena y por sucursal, entre fechas, por monto.
 	//6. Ranking de ventas de productos, total de la cadena y por sucursal, entre fechas, por cantidad vendida.
 	
 	//7. Ranking de clientes por compras, total de la cadena y por sucursal, entre fechas, por monto.
-	private static void Consulta7() {
-		MongoClient mongoClient = MongoClients.create();
-		MongoDatabase db = mongoClient.getDatabase("test");
-		
-		MongoCollection<Document> collSucursales = db.getCollection("Sucursales");
-		
-		List<Sucursal> sucursales = new ArrayList();
-		
-	    ObjectMapper mapper = new ObjectMapper();
-	    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-	    
-	    try{
-			MongoCursor<Document> curSucursales = collSucursales.find().iterator();
-			try {
-			    while (curSucursales.hasNext()) {
-			    	sucursales.add(mapper.readValue(curSucursales.next().toJson(), Sucursal.class));
-			    }
-			} finally {
-			    curSucursales.close();
-			}
-			Bson group = group("$cliente.dni", sum("total","$total"), first("Cliente", "$cliente"));
-			for(Sucursal s : sucursales) {
-				System.out.println("Sucursal " + s.getNumeroTicket());
-				Bson match = match(regex("numeroTicket", String.format("%04d-.*", s.getNumeroTicket())));
-				RankingCliente(db, match, group);
-				System.out.println("");
-			}
-			System.out.println("Por cadena");
-			Bson match = match(gte("total", 0));
-			RankingCliente(db, match, group);
-				
-			
-	    }
-		catch (JsonParseException e) { e.printStackTrace();}
-	    catch (JsonMappingException e) { e.printStackTrace(); }
-	    catch (Exception e) { e.printStackTrace(); }
+	private static void consulta7() {
+		List<Bson> filtros = new ArrayList();
+		filtros.add(group("$cliente.dni", sum("total","$total"), first("Cliente", "$cliente")));
+		rankingCliente(filtros, "monto total");
 	}
 	
 	//8. Ranking de clientes por compras, total de la cadena y por sucursal, entre fechas, por cantidad vendida.
-	private static void Consulta8() {
+	private static void consulta8() {
+		List<Bson> filtros = new ArrayList();
+		filtros.add(group("$cliente.dni", sum("total", 1), first("Cliente", "$cliente")));
+		rankingCliente(filtros, "cantidad");
+	}
+	
+	private static void ventaxProducto(String tipo) {
 		MongoClient mongoClient = MongoClients.create();
 		MongoDatabase db = mongoClient.getDatabase("test");
 		
-		MongoCollection<Document> collSucursales = db.getCollection("Sucursales");
-		
-		List<Sucursal> sucursales = new ArrayList();
-		
-	    ObjectMapper mapper = new ObjectMapper();
-	    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-	    
-	    try{
-			MongoCursor<Document> curSucursales = collSucursales.find().iterator();
-			try {
-			    while (curSucursales.hasNext()) {
-			    	sucursales.add(mapper.readValue(curSucursales.next().toJson(), Sucursal.class));
-			    }
-			} finally {
-			    curSucursales.close();
-			}
-			Bson group = group("$cliente.dni", sum("total", 1), first("Cliente", "$cliente"));
-			for(Sucursal s : sucursales) {
-				System.out.println("Sucursal " + s.getNumeroTicket());
-				Bson match = match(regex("numeroTicket", String.format("%04d-.*", s.getNumeroTicket())));
-				RankingCliente(db, match, group);
-				System.out.println("");
-			}
-			System.out.println("Por cadena");
-			Bson match = match(gte("total", 0));
-			RankingCliente(db, match, group);
-				
-			
-	    }
-		catch (JsonParseException e) { e.printStackTrace();}
-	    catch (JsonMappingException e) { e.printStackTrace(); }
-	    catch (Exception e) { e.printStackTrace(); }
-	}
-	
-	private static void RankingCliente(MongoDatabase db, Bson match, Bson group){
-		MongoCollection<Document> collVentas = db.getCollection("Ventas");
-		Bson sort = sort(new Document("total", -1));
-		Bson projection = project(fields(excludeId()));
-		MongoCursor<Document> curVentas = collVentas.aggregate(Arrays.asList(match, group, sort, projection)).iterator();
-		try {
-		    while (curVentas.hasNext()) {
-				System.out.println(curVentas.next().toJson());
-		    }
-		} finally {
-			curVentas.close();
-		}
-	}
-	
-	private static void VentasxSucursal(List<Bson> filtros) {
-		MongoClient mongoClient = MongoClients.create();
-		MongoDatabase db = mongoClient.getDatabase("test");
-		
-		MongoCollection<Document> collSucursales = db.getCollection("Sucursales");
 		MongoCollection<Document> collVentas = db.getCollection("Ventas");
 		
+		List<Sucursal> sucursales = getSucursales(db);
 		
-		List<Sucursal> sucursales = new ArrayList();
-		
-	    ObjectMapper mapper = new ObjectMapper();
+		ObjectMapper mapper = new ObjectMapper();
 	    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-	    
-	    try{
-			MongoCursor<Document> curSucursales = collSucursales.find().iterator();
-			try {
-			    while (curSucursales.hasNext()) {
-			    	sucursales.add(mapper.readValue(curSucursales.next().toJson(), Sucursal.class));
-			    }
-			} finally {
-			    curSucursales.close();
-			}
-			
-			for(Sucursal s : sucursales) {
-				List<Venta> ventas = new ArrayList();
-				filtros.add(regex("numeroTicket", String.format("%04d-.*", s.getNumeroTicket())));
-				MongoCursor<Document> curVentas = collVentas.find(and(filtros)).projection(exclude("fecha")).iterator();
-				filtros.remove(filtros.size()-1);
+		
+		Bson filtro = match(eq("productos.producto.tipo", tipo));
+		Bson unwind = new BasicDBObject("$unwind","$productos");
+		Bson group = group("$productos.producto.codigo", first("eproducto","$productos.producto"), push("ecantidad", "$productos.cantidad"), first("eprecio","$productos.precio"), push("etotal", "$productos.total"));
+		Bson projection = project(fields(Arrays.asList(new BasicDBObject("cantidad", new BasicDBObject("$sum", "$ecantidad")),new BasicDBObject("precio","$eprecio"), new BasicDBObject("total", new BasicDBObject("$sum", "$etotal")), new BasicDBObject("producto","$eproducto"))));
+		float totalCadena = 0;
+		for(Sucursal s : sucursales) {
+			float totalSucursal = 0;
+			Bson sucursal =  match(regex("numeroTicket", String.format("%04d-.*", s.getNumeroTicket())));
+			try{
+				MongoCursor<Document> curVentas = collVentas.aggregate(Arrays.asList(sucursal, unwind, filtro, group, projection)).iterator();
+				System.out.println("Detalle de ventas de productos del tipo " + tipo.toLowerCase() + " en la sucursal " + s.getNumeroTicket());
 				try {
-				    while (curVentas.hasNext()) {
-				    	ventas.add(mapper.readValue(curVentas.next().toJson(), Venta.class));
+					while (curVentas.hasNext()) {
+				    	ProductoVendido producto = mapper.readValue(curVentas.next().toJson(), ProductoVendido.class);
+				    	System.out.println(producto);
+				    	totalSucursal += producto.getTotal();
 				    }
 				} finally {
 					curVentas.close();
-					s.setVentas(ventas);
+					totalCadena += totalSucursal;
+					System.out.println("Ventas totales de " + tipo + " en la sucursal " + s.getNumeroTicket() + ": " + totalSucursal + "\n");
 				}
+		    }
+			catch (JsonParseException e) { e.printStackTrace();}
+		    catch (JsonMappingException e) { e.printStackTrace(); }
+		    catch (Exception e) { e.printStackTrace(); }
+		}
+		try{
+			MongoCursor<Document> curVentas = collVentas.aggregate(Arrays.asList(unwind, filtro, group, projection)).iterator();
+			System.out.println("Detalle de ventas de productos del tipo " + tipo.toLowerCase() + " en la cadena");
+			try {
+			    while (curVentas.hasNext()) {
+			    	ProductoVendido producto = mapper.readValue(curVentas.next().toJson(), ProductoVendido.class);
+			    	System.out.println(producto);
+			    }
+			} finally {
+				curVentas.close();
+				System.out.println("Ventas totales de " + tipo + " en la cadena: " + totalCadena);
 			}
-			float totalCadena = 0;
-			for(Sucursal s : sucursales) {
-				float totalSucursal = 0;
-				System.out.println("Detalle de ventas de la sucursal " + s.getNumeroTicket());
-				for(Venta v : s.getVentas()) {
-					System.out.println(v);
-					totalSucursal += v.getTotal();
-				}
-				System.out.println("Ventas totales de la sucursal " + s.getNumeroTicket() + ": " + totalSucursal + "\n");
-				totalCadena += totalSucursal;
-			}
-			System.out.println("Ventas totales de la cadena: " + totalCadena);
+		}
+		catch (JsonParseException e) { e.printStackTrace();}
+	    catch (JsonMappingException e) { e.printStackTrace(); }
+	    catch (Exception e) { e.printStackTrace(); }
+		
+	}
+	
+	private static void rankingCliente(List<Bson> filtros, String motivo) {
+		MongoClient mongoClient = MongoClients.create();
+		MongoDatabase db = mongoClient.getDatabase("test");
+		
+		List<Sucursal> sucursales = getSucursales(db);
+		
+		for(Sucursal s : sucursales) {
+			System.out.println("Ranking de clientes por " + motivo + " de compras de la sucursal " + s.getNumeroTicket());
+			filtros.add(0, match(regex("numeroTicket", String.format("%04d-.*", s.getNumeroTicket()))));
+			imprimirRankingCliente(db, filtros);
+			filtros.remove(0);
+			System.out.println("");
+		}
+		System.out.println("Ranking de clientes por " + motivo + " de la cadena");
+		imprimirRankingCliente(db, filtros);
+	}
+	
+	private static void imprimirRankingCliente(MongoDatabase db, List<Bson> filtros){
+		MongoCollection<Document> collVentas = db.getCollection("Ventas");
 			
+		ObjectMapper mapper = new ObjectMapper();
+	    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	    
+	    try{
+	    	filtros.add(sort(new Document("total", -1)));
+			filtros.add(project(fields(excludeId())));
+			MongoCursor<Document> curVentas = collVentas.aggregate(filtros).iterator();
+			try {
+			    while (curVentas.hasNext()) {
+			    	Document aux = curVentas.next();
+			    	Cliente cliente = mapper.readValue(((Document) aux.get("Cliente")).toJson(), Cliente.class);
+			    	System.out.println("Total: " + round(Float.parseFloat(aux.get("total").toString()), 2) + " " + cliente);
+			    }
+			} finally {
+				curVentas.close();
+			}
 	    }
 		catch (JsonParseException e) { e.printStackTrace();}
 	    catch (JsonMappingException e) { e.printStackTrace(); }
 	    catch (Exception e) { e.printStackTrace(); }
 	}
 	
+	private static List<Sucursal> getSucursales(MongoDatabase db){
+		MongoCollection<Document> collSucursales = db.getCollection("Sucursales");
+		
+		List<Sucursal> sucursales = new ArrayList();
+		
+	    ObjectMapper mapper = new ObjectMapper();
+	    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	    
+	    try{
+			MongoCursor<Document> curSucursales = collSucursales.find().iterator();
+			try {
+			    while (curSucursales.hasNext()) {
+			    	sucursales.add(mapper.readValue(curSucursales.next().toJson(), Sucursal.class));
+			    }
+			} finally {
+			    curSucursales.close();
+			}
+	    }
+		catch (JsonParseException e) { e.printStackTrace();}
+	    catch (JsonMappingException e) { e.printStackTrace(); }
+	    catch (Exception e) { e.printStackTrace(); }
+		return sucursales;
+	}
+
+	private static void ventasxSucursal(List<Bson> filtros, String motivo) {
+		MongoClient mongoClient = MongoClients.create();
+		MongoDatabase db = mongoClient.getDatabase("test");
+		
+		MongoCollection<Document> collVentas = db.getCollection("Ventas");
+		
+		List<Venta> ventas = new ArrayList();
+		List<Sucursal> sucursales = getSucursales(db);
+		
+	    ObjectMapper mapper = new ObjectMapper();
+	    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	    
+	    filtros.add(project(fields(exclude("fecha"))));
+	    float totalCadena = 0;
+		for(Sucursal s : sucursales) {
+			float totalSucursal = 0;
+			filtros.add(match(regex("numeroTicket", String.format("%04d-.*", s.getNumeroTicket()))));
+			System.out.println("Detalle de ventas de la sucursal " + s.getNumeroTicket() + ((motivo!=null) ? (" por " + motivo) : ("")));
+			try{
+				MongoCursor<Document> curVentas = collVentas.aggregate(filtros).iterator();
+				filtros.remove(filtros.size()-1);
+				try {
+				    while (curVentas.hasNext()) {
+				    	Venta venta = mapper.readValue(curVentas.next().toJson(), Venta.class);
+				    	System.out.println(venta);
+				    	totalSucursal += venta.getTotal();
+				    	ventas.add(venta);
+				    }
+				} finally {
+					curVentas.close();
+					System.out.println("Ventas totales de la sucursal " + s.getNumeroTicket() + ": " + totalSucursal + "\n");
+					totalCadena += totalSucursal;
+				}
+			} 
+			catch (JsonParseException e) { e.printStackTrace();}
+		    catch (JsonMappingException e) { e.printStackTrace(); }
+		    catch (Exception e) { e.printStackTrace(); }
+		}
+		System.out.println("Detalle de ventas de la cadena" + ((motivo!=null) ? (" por " + motivo) : ("")));
+		for(Venta v: ventas) {
+			System.out.println(v);
+		}
+		System.out.println("Ventas totales de la cadena: " + totalCadena);
+	}
 	
+	public static Object round(float d, int decimalPlace) {
+		if(d%1 > 0) {
+			BigDecimal bd = new BigDecimal(Float.toString(d));
+		    bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
+		    return bd.floatValue();
+		}
+	    return (int)d;
+	}
 }
+
+
