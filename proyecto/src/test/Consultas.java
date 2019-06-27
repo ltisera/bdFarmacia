@@ -35,30 +35,30 @@ public class Consultas {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		//consulta1(new GregorianCalendar(), new GregorianCalendar());  //Falta entre fechas
+		consulta1(new GregorianCalendar(), new GregorianCalendar());  //Falta entre fechas
 		//consulta2("OSDE", new GregorianCalendar(), new GregorianCalendar()); //Falta entre fechas
 		//consulta3("Tarjeta", new GregorianCalendar(), new GregorianCalendar()); //Falta entre fechas
 		//consulta4(new GregorianCalendar(), new GregorianCalendar());  //Falta entre fechas
-		//consulta5();   //HELP
-		//consulta6();   //HELP
-		consulta7();	 //Falta entre fechas
-		//consulta8();	 //Falta entre fechas
+		//consulta5(new GregorianCalendar(), new GregorianCalendar());   //Falta entre fechas
+		//consulta6(new GregorianCalendar(), new GregorianCalendar());   //Falta entre fechas
+		//consulta7(new GregorianCalendar(), new GregorianCalendar());	 //Falta entre fechas
+		//consulta8(new GregorianCalendar(), new GregorianCalendar());	 //Falta entre fechas
 	}
 	
 	
 	//1. Detalle y totales de ventas para la cadena completa y por sucursal, entre fechas.
 	private static void consulta1(GregorianCalendar desde, GregorianCalendar hasta) {
 		List<Bson> filtros = new ArrayList();
-		//filtros.add(gte("fecha", desde));
-		//filtros.add(lte("fecha", hasta));
+		//filtros.add(match(gte("fecha", desde)));
+		//filtros.add(match(lte("fecha", hasta)));
 		ventasxSucursal(filtros, null);
 	}
 	
 	//2. Detalle y totales de ventas para la cadena completa y por sucursal, por obra social o privados entre fechas.
 	private static void consulta2(String obraSocial, GregorianCalendar desde, GregorianCalendar hasta) {
 		List<Bson> filtros = new ArrayList();
-		//filtros.add(gte("fecha", desde));
-		//filtros.add(lte("fecha", hasta));
+		//filtros.add(match(gte("fecha", desde)));
+		//filtros.add(match(lte("fecha", hasta)));
 		filtros.add(match(eq("cliente.obraSocial", obraSocial)));
 		ventasxSucursal(filtros, "tipo obra social: " + obraSocial);
 	}
@@ -66,37 +66,61 @@ public class Consultas {
 	//3. Detalle y totales de cobranza para la cadena completa y por sucursal, por medio de pago y entre fechas.
 	private static void consulta3(String medioPago, GregorianCalendar desde, GregorianCalendar hasta) {
 		List<Bson> filtros = new ArrayList();
-		//filtros.add(gte("fecha", desde));
-		//filtros.add(lte("fecha", hasta));
+		//filtros.add(match(gte("fecha", desde)));
+		//filtros.add(match(lte("fecha", hasta)));
 		filtros.add(match(eq("formaDePago", medioPago)));
 		ventasxSucursal(filtros, "forma de pago: " + medioPago);
 	}
 	
 	//4. Detalle y totales de ventas de productos, total de la cadena y por sucursal, entre fechas, diferenciados entre farmacia y perfumería.
 	private static void consulta4(GregorianCalendar desde, GregorianCalendar hasta) {
-		ventaxProducto("Medicamento");
+		List<Bson> filtros = new ArrayList();
+		//filtros.add(match(gte("fecha", desde)));
+		//filtros.add(match(lte("fecha", hasta)));
+		ventaxProducto(filtros, "Medicamento");
 		System.out.println("");
-		ventaxProducto("Perfumeria");
+		filtros = new ArrayList();
+		//filtros.add(match(gte("fecha", desde)));
+		//filtros.add(match(lte("fecha", hasta)));
+		ventaxProducto(filtros, "Perfumeria");
 	}
 
 	//5. Ranking de ventas de productos, total de la cadena y por sucursal, entre fechas, por monto.
+	private static void consulta5(GregorianCalendar desde, GregorianCalendar hasta) {
+		List<Bson> filtros = new ArrayList();
+		//filtros.add(match(gte("fecha", desde)));
+		//filtros.add(match(lte("fecha", hasta)));
+		rankingProducto(filtros, "total");
+	}
+	
 	//6. Ranking de ventas de productos, total de la cadena y por sucursal, entre fechas, por cantidad vendida.
+	private static void consulta6(GregorianCalendar desde, GregorianCalendar hasta) {
+		List<Bson> filtros = new ArrayList();
+		//filtros.add(match(gte("fecha", desde)));
+		//filtros.add(match(lte("fecha", hasta)));
+		rankingProducto(filtros, "cantidad");
+	}
+	
 	
 	//7. Ranking de clientes por compras, total de la cadena y por sucursal, entre fechas, por monto.
-	private static void consulta7() {
+	private static void consulta7(GregorianCalendar desde, GregorianCalendar hasta) {
 		List<Bson> filtros = new ArrayList();
+		//filtros.add(match(gte("fecha", desde)));
+		//filtros.add(match(lte("fecha", hasta)));
 		filtros.add(group("$cliente.dni", sum("total","$total"), first("Cliente", "$cliente")));
 		rankingCliente(filtros, "monto total");
 	}
 	
 	//8. Ranking de clientes por compras, total de la cadena y por sucursal, entre fechas, por cantidad vendida.
-	private static void consulta8() {
+	private static void consulta8(GregorianCalendar desde, GregorianCalendar hasta) {
 		List<Bson> filtros = new ArrayList();
+		//filtros.add(match(gte("fecha", desde)));
+		//filtros.add(match(lte("fecha", hasta)));
 		filtros.add(group("$cliente.dni", sum("total", 1), first("Cliente", "$cliente")));
 		rankingCliente(filtros, "cantidad");
 	}
 	
-	private static void ventaxProducto(String tipo) {
+	private static void ventaxProducto(List<Bson> filtros, String tipo) {
 		MongoClient mongoClient = MongoClients.create();
 		MongoDatabase db = mongoClient.getDatabase("test");
 		
@@ -107,16 +131,17 @@ public class Consultas {
 		ObjectMapper mapper = new ObjectMapper();
 	    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		
-		Bson filtro = match(eq("productos.producto.tipo", tipo));
-		Bson unwind = new BasicDBObject("$unwind","$productos");
-		Bson group = group("$productos.producto.codigo", first("eproducto","$productos.producto"), push("ecantidad", "$productos.cantidad"), first("eprecio","$productos.precio"), push("etotal", "$productos.total"));
-		Bson projection = project(fields(Arrays.asList(new BasicDBObject("cantidad", new BasicDBObject("$sum", "$ecantidad")),new BasicDBObject("precio","$eprecio"), new BasicDBObject("total", new BasicDBObject("$sum", "$etotal")), new BasicDBObject("producto","$eproducto"))));
+	    filtros.add(new BasicDBObject("$unwind","$productos"));
+		filtros.add(match(eq("productos.producto.tipo", tipo)));
+		filtros.add(group("$productos.producto.codigo", first("eproducto","$productos.producto"), push("ecantidad", "$productos.cantidad"), first("eprecio","$productos.precio"), push("etotal", "$productos.total")));
+		filtros.add(project(fields(Arrays.asList(new BasicDBObject("cantidad", new BasicDBObject("$sum", "$ecantidad")),new BasicDBObject("precio","$eprecio"), new BasicDBObject("total", new BasicDBObject("$sum", "$etotal")), new BasicDBObject("producto","$eproducto")))));
 		float totalCadena = 0;
 		for(Sucursal s : sucursales) {
 			float totalSucursal = 0;
-			Bson sucursal =  match(regex("numeroTicket", String.format("%04d-.*", s.getNumeroTicket())));
 			try{
-				MongoCursor<Document> curVentas = collVentas.aggregate(Arrays.asList(sucursal, unwind, filtro, group, projection)).iterator();
+				filtros.add(0,match(regex("numeroTicket", String.format("%04d-.*", s.getNumeroTicket()))));
+				MongoCursor<Document> curVentas = collVentas.aggregate(filtros).iterator();
+				filtros.remove(0);
 				System.out.println("Detalle de ventas de productos del tipo " + tipo.toLowerCase() + " en la sucursal " + s.getNumeroTicket());
 				try {
 					while (curVentas.hasNext()) {
@@ -135,7 +160,7 @@ public class Consultas {
 		    catch (Exception e) { e.printStackTrace(); }
 		}
 		try{
-			MongoCursor<Document> curVentas = collVentas.aggregate(Arrays.asList(unwind, filtro, group, projection)).iterator();
+			MongoCursor<Document> curVentas = collVentas.aggregate(filtros).iterator();
 			System.out.println("Detalle de ventas de productos del tipo " + tipo.toLowerCase() + " en la cadena");
 			try {
 			    while (curVentas.hasNext()) {
@@ -153,6 +178,50 @@ public class Consultas {
 		
 	}
 	
+	private static void rankingProducto(List<Bson> filtros, String motivo) {
+		MongoClient mongoClient = MongoClients.create();
+		MongoDatabase db = mongoClient.getDatabase("test");
+		
+		List<Sucursal> sucursales = getSucursales(db);
+		
+		filtros.add(new BasicDBObject("$unwind","$productos"));
+		filtros.add(group("$productos.producto.codigo", first("eproducto","$productos.producto"), push("ecantidad", "$productos.cantidad"), first("eprecio","$productos.precio"), push("etotal", "$productos.total")));
+		filtros.add(project(fields(Arrays.asList(new BasicDBObject("cantidad", new BasicDBObject("$sum", "$ecantidad")),new BasicDBObject("precio","$eprecio"), new BasicDBObject("total", new BasicDBObject("$sum", "$etotal")), new BasicDBObject("producto","$eproducto")))));
+		filtros.add(sort(new Document(motivo, -1)));
+		
+		for(Sucursal s : sucursales) {
+			System.out.println("Ranking de productos por " + motivo + " de compras en la sucursal " + s.getNumeroTicket());
+			filtros.add(0, match(regex("numeroTicket", String.format("%04d-.*", s.getNumeroTicket()))));
+			imprimirRankingProducto(db, filtros);
+			filtros.remove(0);
+			System.out.println("");
+		}
+		System.out.println("Ranking de productos por " + motivo + " de compras en la cadena");
+		imprimirRankingProducto(db, filtros);
+	}
+	
+	private static void imprimirRankingProducto(MongoDatabase db, List<Bson> filtros){
+		MongoCollection<Document> collVentas = db.getCollection("Ventas");
+			
+		ObjectMapper mapper = new ObjectMapper();
+	    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	    
+	    try{
+			MongoCursor<Document> curVentas = collVentas.aggregate(filtros).iterator();
+			try {
+			    while (curVentas.hasNext()) {
+			    	ProductoVendido producto = mapper.readValue(curVentas.next().toJson(), ProductoVendido.class);
+			    	System.out.println(producto);
+			    }
+			} finally {
+				curVentas.close();
+			}
+	    }
+		catch (JsonParseException e) { e.printStackTrace();}
+	    catch (JsonMappingException e) { e.printStackTrace(); }
+	    catch (Exception e) { e.printStackTrace(); }
+	}
+	
 	private static void rankingCliente(List<Bson> filtros, String motivo) {
 		MongoClient mongoClient = MongoClients.create();
 		MongoDatabase db = mongoClient.getDatabase("test");
@@ -166,7 +235,7 @@ public class Consultas {
 			filtros.remove(0);
 			System.out.println("");
 		}
-		System.out.println("Ranking de clientes por " + motivo + " de la cadena");
+		System.out.println("Ranking de clientes por " + motivo + " de compras de la cadena");
 		imprimirRankingCliente(db, filtros);
 	}
 	
