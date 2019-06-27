@@ -11,7 +11,8 @@ import modelo.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.GregorianCalendar;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -19,7 +20,6 @@ import org.bson.Document;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CrearDatos {
 	public static void main(String[] args) {
@@ -39,6 +39,11 @@ public class CrearDatos {
 			List<String> nombres = new ArrayList<>(Arrays.asList("Alejandra", "Alex", "Candela", "Cristian", "Delia", "Diego", "Eugenia", "Fabio", "Federico", "Gabriel", "Juan", "Juana", "Jose", "Leandro", "Luis", "Marcos", "Oscar", "Pedro", "Rita", "Sandra", "Tomas", "Valeria"));
 			List<String> apellidos = new ArrayList<>(Arrays.asList("Alonso", "Alvarez", "Blanco", "Diaz", "Fernandez", "Garcia", "Gomez", "Gonzales", "Gutierrez", "Hernandez", "Jimenez", "Lopez", "Martinez", "Moreno", "Muñoz", "Perez", "Rodriguez", "Ruiz", "Sanchez", "Santos", "Torres", "Vazquez"));
 			List<String> obrasSociales = new ArrayList<>(Arrays.asList("Pami", "OSDE", "Privado"));
+			List<String> calles = new ArrayList<>(Arrays.asList("Belgrano", "Av. 12", "Callao", "Jujuy", "Pueyrredón", "Entre Ríos", "Rivadavia", "Portela"));
+			List<String> localidades = new ArrayList<>(Arrays.asList("Glew", "Longchamps", "Burzaco", "Adrogue", "Temperley", "Lomas de Zamora", "CABA"));
+			List<Integer> lstdni = new ArrayList<>(Arrays.asList(13860074,16166480,17275296,21637472,22897364,22908276,23965733,25663395,26199914,29326389,30259082,30998989,31541447,32608788,34948474,40232066,41385897,46199776,48502480,50655101,51375110,52205322,93049214,94585322,94603443,94749071,94753202,96913752));
+			
+			
 			
 			List<Sucursal> lstSucursales = new ArrayList();
 			List<Producto> lstProductos = new ArrayList();
@@ -62,8 +67,8 @@ public class CrearDatos {
 			for(int i = 0; i < clientes; i ++) {
 				String apellido = apellidos.remove(rand.nextInt(apellidos.size()));
 				String nombre = nombres.remove(rand.nextInt(nombres.size()));
-				int dni = 40805000 + (i * 10) + i;
-				Domicilio dom = new Domicilio("calle" + i, 110 + i, "Localidad", "Buenos Aires");
+				int dni = lstdni.remove(rand.nextInt(lstdni.size()));
+				Domicilio dom = new Domicilio(calles.get(rand.nextInt(calles.size())), rand.nextInt(1500) + 100, localidades.get(rand.nextInt(localidades.size())), "Buenos Aires");
 				String obraSocial = obrasSociales.get(rand.nextInt(obrasSociales.size()));
 				int nroAfiliado = i;
 				Cliente cliente = new Cliente(apellido, nombre, dni, dom, obraSocial, nroAfiliado);
@@ -77,20 +82,18 @@ public class CrearDatos {
 			// --------------- Sucursales y Empleados ---------------
 			System.out.print("Cargando sucursales y empleados... ");
 			for(int j = 0; j < sucursales; j ++) {
-				Domicilio domic = new Domicilio("Av " + j, 40 + j, "Localidad", "Buenos Aires");
+				Domicilio domic = new Domicilio(calles.get(rand.nextInt(calles.size())), rand.nextInt(1500) + 100, localidades.get(rand.nextInt(localidades.size())), "Buenos Aires");
 				List<Empleado> lstEmpleados = new ArrayList();
 				Empleado encargado = null;
 				int nroTicket = j + 1;
 				for(int i = 0; i < empleadosXsucursal; i ++) {
 					String apellido = apellidos.remove(rand.nextInt(apellidos.size()));
 					String nombre = nombres.remove(rand.nextInt(nombres.size()));
-					int dni = 56784000 + (i * 10) + i + j;
-					String cuil = "20-" + (dni * 100L) + "-0";
-					Domicilio dom = new Domicilio("calle falsa " + i, 230 + i, "Localidad", "Buenos Aires");
-					String obraSocial = "Pami";
+					int dni = lstdni.remove(rand.nextInt(lstdni.size()));
+					Domicilio dom = new Domicilio(calles.get(rand.nextInt(calles.size())), rand.nextInt(1500) + 100, localidades.get(rand.nextInt(localidades.size())), "Buenos Aires");
+					String obraSocial = obrasSociales.get(rand.nextInt(obrasSociales.size()-1));
 					int nroAfiliado = clientes + i + (j * 10);
-					
-					Empleado empleado = new Empleado(apellido, nombre, dni, dom, obraSocial, nroAfiliado, cuil);
+					Empleado empleado = new Empleado(apellido, nombre, dni, dom, obraSocial, nroAfiliado, traerCuil(20, dni));
 					Document doc = Document.parse(mapper.writeValueAsString(empleado));
 					collectionEmpleado.insertOne(doc);
 					
@@ -137,7 +140,9 @@ public class CrearDatos {
 					Empleado empleadoAtendio = s.getEmpleados().get(rand.nextInt(s.getEmpleados().size()));
 					Empleado empleadoCobro = s.getEmpleados().get(rand.nextInt(s.getEmpleados().size()));
 					Cliente cliente = lstClientes.get(rand.nextInt(lstClientes.size()));
-					GregorianCalendar fecha = new GregorianCalendar();
+					Calendar cal = Calendar.getInstance();
+					cal.add(Calendar.DATE, -rand.nextInt(90));
+					Date fecha = cal.getTime();
 					String formaDePago = "";
 					int opc = rand.nextInt(3);
 					if(opc == 0) {
@@ -185,5 +190,32 @@ public class CrearDatos {
 	    BigDecimal bd = new BigDecimal(Float.toString(d));
 	    bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
 	    return bd.floatValue();
+	}
+	
+	public static String traerCuil(int tipo,int dni) {
+		String temp = Integer.toString(tipo) + Integer.toString(dni);
+		int[] cuil = new int[temp.length()];
+		int[] multriplicar = {5,4,3,2,7,6,5,4,3,2};
+		int verificador = 0;
+		for (int i = 0; i < temp.length(); i++)
+		{
+		    cuil[i] = temp.charAt(i) ;
+		    verificador += cuil[i] * multriplicar[i];
+		}
+		verificador = verificador % 11;
+		if(verificador == 1) {
+			if(tipo == 20) {
+				verificador = 9;
+				tipo = 23;
+			}
+			if(tipo == 27) {
+				verificador = 4;
+				tipo = 23;
+			}
+		}else if(verificador != 0) {
+			verificador = (11 - verificador);
+		}
+		
+		return tipo + "-" + dni + "-" + verificador;
 	}
 }

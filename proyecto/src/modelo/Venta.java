@@ -1,11 +1,16 @@
 package modelo;
 
-import java.util.GregorianCalendar;
+import java.util.Date;
 import java.util.List;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public class Venta 
 {
-	private GregorianCalendar fecha;
+	@JsonDeserialize(using = MongoDateDeserializer.class)
+	@JsonSerialize(using = MongoDateSerializer.class)
+	private Date fecha;
 	private String numeroTicket;
 	private float total;
 	private String formaDePago;
@@ -18,7 +23,7 @@ public class Venta
 		super();
 	}
 
-	public Venta(GregorianCalendar fecha,String numeroTicket, float total, String formaDePago,
+	public Venta(Date fecha,String numeroTicket, float total, String formaDePago,
 			List<ProductoVendido> productos, Empleado empleadoAtendio, Empleado empleadoCobro, Cliente cliente) {
 		super();
 		this.fecha = fecha;
@@ -31,7 +36,7 @@ public class Venta
 		this.cliente = cliente;
 	}
 
-	public Venta(GregorianCalendar fecha, int numeroTicket, int numeroSucursal, String formaDePago,
+	public Venta(Date fecha, int numeroTicket, int numeroSucursal, String formaDePago,
 			List<ProductoVendido> productos, Empleado empleadoAtendio, Empleado empleadoCobro, Cliente cliente) {
 		super();
 		this.fecha = fecha;
@@ -46,11 +51,11 @@ public class Venta
 		}
 	}
 	
-	public GregorianCalendar getFecha() {
-		return fecha;
+	public Date getFecha() {
+		return this.fecha;
 	}
 
-	public void setFecha(GregorianCalendar fecha) {
+	public void setFecha(Date fecha) {
 		this.fecha = fecha;
 	}
 

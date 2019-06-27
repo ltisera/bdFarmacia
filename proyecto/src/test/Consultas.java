@@ -1,10 +1,11 @@
 package test;
 
+import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.GregorianCalendar;
+import java.util.Date;
 import java.util.List;
 
 import org.bson.Document;
@@ -26,7 +27,6 @@ import static com.mongodb.client.model.Accumulators.*;
 import static com.mongodb.client.model.Aggregates.*;
 
 import modelo.Cliente;
-import modelo.Producto;
 import modelo.ProductoVendido;
 import modelo.Sucursal;
 import modelo.Venta;
@@ -35,27 +35,47 @@ public class Consultas {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		consulta1(new GregorianCalendar(), new GregorianCalendar());  //Falta entre fechas
-		//consulta2("OSDE", new GregorianCalendar(), new GregorianCalendar()); //Falta entre fechas
-		//consulta3("Tarjeta", new GregorianCalendar(), new GregorianCalendar()); //Falta entre fechas
-		//consulta4(new GregorianCalendar(), new GregorianCalendar());  //Falta entre fechas
-		//consulta5(new GregorianCalendar(), new GregorianCalendar());   //Falta entre fechas
-		//consulta6(new GregorianCalendar(), new GregorianCalendar());   //Falta entre fechas
-		//consulta7(new GregorianCalendar(), new GregorianCalendar());	 //Falta entre fechas
-		//consulta8(new GregorianCalendar(), new GregorianCalendar());	 //Falta entre fechas
+		Instant instant = Instant.parse("2019-05-27T00:00:00.001Z");
+		Date desde = Date.from(instant);
+		instant = Instant.parse("2019-06-27T00:00:00.001Z");
+		Date hasta = Date.from(instant);
+		  
+		try {
+			consulta1(desde, hasta);
+			System.in.read();
+			consulta2("OSDE", desde, hasta);
+			System.in.read();
+			consulta3("Tarjeta", desde, hasta);
+			System.in.read();
+			consulta4(desde, hasta);
+			System.in.read();
+			consulta5(desde, hasta);
+			System.in.read();
+			consulta6(desde, hasta);
+			System.in.read();
+			consulta7(desde, hasta);
+			System.in.read();
+			consulta8(desde, hasta);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	
 	
 	//1. Detalle y totales de ventas para la cadena completa y por sucursal, entre fechas.
-	private static void consulta1(GregorianCalendar desde, GregorianCalendar hasta) {
+	private static void consulta1(Date desde, Date hasta) {
+		System.out.println("\n1. Detalle y totales de ventas para la cadena completa y por sucursal, entre fechas.\n");
 		List<Bson> filtros = new ArrayList();
-		//filtros.add(match(gte("fecha", desde)));
-		//filtros.add(match(lte("fecha", hasta)));
+		filtros.add(match(gte("fecha", desde)));
+		filtros.add(match(lte("fecha", hasta)));
 		ventasxSucursal(filtros, null);
 	}
 	
 	//2. Detalle y totales de ventas para la cadena completa y por sucursal, por obra social o privados entre fechas.
-	private static void consulta2(String obraSocial, GregorianCalendar desde, GregorianCalendar hasta) {
+	private static void consulta2(String obraSocial, Date desde, Date hasta) {
+		System.out.println("\n2. Detalle y totales de ventas para la cadena completa y por sucursal, por obra social o privados entre fechas.\n");
 		List<Bson> filtros = new ArrayList();
 		//filtros.add(match(gte("fecha", desde)));
 		//filtros.add(match(lte("fecha", hasta)));
@@ -64,7 +84,8 @@ public class Consultas {
 	}
 	
 	//3. Detalle y totales de cobranza para la cadena completa y por sucursal, por medio de pago y entre fechas.
-	private static void consulta3(String medioPago, GregorianCalendar desde, GregorianCalendar hasta) {
+	private static void consulta3(String medioPago, Date desde, Date hasta) {
+		System.out.println("\n3. Detalle y totales de cobranza para la cadena completa y por sucursal, por medio de pago y entre fechas.\n");
 		List<Bson> filtros = new ArrayList();
 		//filtros.add(match(gte("fecha", desde)));
 		//filtros.add(match(lte("fecha", hasta)));
@@ -73,12 +94,13 @@ public class Consultas {
 	}
 	
 	//4. Detalle y totales de ventas de productos, total de la cadena y por sucursal, entre fechas, diferenciados entre farmacia y perfumería.
-	private static void consulta4(GregorianCalendar desde, GregorianCalendar hasta) {
+	private static void consulta4(Date desde, Date hasta) {
+		System.out.println("\n4. Detalle y totales de ventas de productos, total de la cadena y por sucursal, entre fechas, diferenciados entre farmacia y perfumería.\n");
 		List<Bson> filtros = new ArrayList();
 		//filtros.add(match(gte("fecha", desde)));
 		//filtros.add(match(lte("fecha", hasta)));
 		ventaxProducto(filtros, "Medicamento");
-		System.out.println("");
+		System.out.println("\n");
 		filtros = new ArrayList();
 		//filtros.add(match(gte("fecha", desde)));
 		//filtros.add(match(lte("fecha", hasta)));
@@ -86,7 +108,8 @@ public class Consultas {
 	}
 
 	//5. Ranking de ventas de productos, total de la cadena y por sucursal, entre fechas, por monto.
-	private static void consulta5(GregorianCalendar desde, GregorianCalendar hasta) {
+	private static void consulta5(Date desde, Date hasta) {
+		System.out.println("\n5. Ranking de ventas de productos, total de la cadena y por sucursal, entre fechas, por monto.\n");
 		List<Bson> filtros = new ArrayList();
 		//filtros.add(match(gte("fecha", desde)));
 		//filtros.add(match(lte("fecha", hasta)));
@@ -94,7 +117,8 @@ public class Consultas {
 	}
 	
 	//6. Ranking de ventas de productos, total de la cadena y por sucursal, entre fechas, por cantidad vendida.
-	private static void consulta6(GregorianCalendar desde, GregorianCalendar hasta) {
+	private static void consulta6(Date desde, Date hasta) {
+		System.out.println("\n6. Ranking de ventas de productos, total de la cadena y por sucursal, entre fechas, por cantidad vendida.\n");
 		List<Bson> filtros = new ArrayList();
 		//filtros.add(match(gte("fecha", desde)));
 		//filtros.add(match(lte("fecha", hasta)));
@@ -103,7 +127,8 @@ public class Consultas {
 	
 	
 	//7. Ranking de clientes por compras, total de la cadena y por sucursal, entre fechas, por monto.
-	private static void consulta7(GregorianCalendar desde, GregorianCalendar hasta) {
+	private static void consulta7(Date desde, Date hasta) {
+		System.out.println("\n7. Ranking de clientes por compras, total de la cadena y por sucursal, entre fechas, por monto.\n");
 		List<Bson> filtros = new ArrayList();
 		//filtros.add(match(gte("fecha", desde)));
 		//filtros.add(match(lte("fecha", hasta)));
@@ -112,7 +137,8 @@ public class Consultas {
 	}
 	
 	//8. Ranking de clientes por compras, total de la cadena y por sucursal, entre fechas, por cantidad vendida.
-	private static void consulta8(GregorianCalendar desde, GregorianCalendar hasta) {
+	private static void consulta8(Date desde, Date hasta) {
+		System.out.println("\n8. Ranking de clientes por compras, total de la cadena y por sucursal, entre fechas, por cantidad vendida.\n");
 		List<Bson> filtros = new ArrayList();
 		//filtros.add(match(gte("fecha", desde)));
 		//filtros.add(match(lte("fecha", hasta)));
@@ -298,9 +324,8 @@ public class Consultas {
 		List<Sucursal> sucursales = getSucursales(db);
 		
 	    ObjectMapper mapper = new ObjectMapper();
-	    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	    
-	    filtros.add(project(fields(exclude("fecha"))));
+	    filtros.add(project(fields(excludeId())));
 	    float totalCadena = 0;
 		for(Sucursal s : sucursales) {
 			float totalSucursal = 0;
