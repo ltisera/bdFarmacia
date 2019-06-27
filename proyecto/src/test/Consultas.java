@@ -77,8 +77,8 @@ public class Consultas {
 	private static void consulta2(String obraSocial, Date desde, Date hasta) {
 		System.out.println("\n2. Detalle y totales de ventas para la cadena completa y por sucursal, por obra social o privados entre fechas.\n");
 		List<Bson> filtros = new ArrayList();
-		//filtros.add(match(gte("fecha", desde)));
-		//filtros.add(match(lte("fecha", hasta)));
+		filtros.add(match(gte("fecha", desde)));
+		filtros.add(match(lte("fecha", hasta)));
 		filtros.add(match(eq("cliente.obraSocial", obraSocial)));
 		ventasxSucursal(filtros, "tipo obra social: " + obraSocial);
 	}
@@ -87,8 +87,8 @@ public class Consultas {
 	private static void consulta3(String medioPago, Date desde, Date hasta) {
 		System.out.println("\n3. Detalle y totales de cobranza para la cadena completa y por sucursal, por medio de pago y entre fechas.\n");
 		List<Bson> filtros = new ArrayList();
-		//filtros.add(match(gte("fecha", desde)));
-		//filtros.add(match(lte("fecha", hasta)));
+		filtros.add(match(gte("fecha", desde)));
+		filtros.add(match(lte("fecha", hasta)));
 		filtros.add(match(eq("formaDePago", medioPago)));
 		ventasxSucursal(filtros, "forma de pago: " + medioPago);
 	}
@@ -97,13 +97,13 @@ public class Consultas {
 	private static void consulta4(Date desde, Date hasta) {
 		System.out.println("\n4. Detalle y totales de ventas de productos, total de la cadena y por sucursal, entre fechas, diferenciados entre farmacia y perfumería.\n");
 		List<Bson> filtros = new ArrayList();
-		//filtros.add(match(gte("fecha", desde)));
-		//filtros.add(match(lte("fecha", hasta)));
+		filtros.add(match(gte("fecha", desde)));
+		filtros.add(match(lte("fecha", hasta)));
 		ventaxProducto(filtros, "Medicamento");
 		System.out.println("\n");
 		filtros = new ArrayList();
-		//filtros.add(match(gte("fecha", desde)));
-		//filtros.add(match(lte("fecha", hasta)));
+		filtros.add(match(gte("fecha", desde)));
+		filtros.add(match(lte("fecha", hasta)));
 		ventaxProducto(filtros, "Perfumeria");
 	}
 
@@ -111,8 +111,8 @@ public class Consultas {
 	private static void consulta5(Date desde, Date hasta) {
 		System.out.println("\n5. Ranking de ventas de productos, total de la cadena y por sucursal, entre fechas, por monto.\n");
 		List<Bson> filtros = new ArrayList();
-		//filtros.add(match(gte("fecha", desde)));
-		//filtros.add(match(lte("fecha", hasta)));
+		filtros.add(match(gte("fecha", desde)));
+		filtros.add(match(lte("fecha", hasta)));
 		rankingProducto(filtros, "total");
 	}
 	
@@ -120,8 +120,8 @@ public class Consultas {
 	private static void consulta6(Date desde, Date hasta) {
 		System.out.println("\n6. Ranking de ventas de productos, total de la cadena y por sucursal, entre fechas, por cantidad vendida.\n");
 		List<Bson> filtros = new ArrayList();
-		//filtros.add(match(gte("fecha", desde)));
-		//filtros.add(match(lte("fecha", hasta)));
+		filtros.add(match(gte("fecha", desde)));
+		filtros.add(match(lte("fecha", hasta)));
 		rankingProducto(filtros, "cantidad");
 	}
 	
@@ -130,8 +130,8 @@ public class Consultas {
 	private static void consulta7(Date desde, Date hasta) {
 		System.out.println("\n7. Ranking de clientes por compras, total de la cadena y por sucursal, entre fechas, por monto.\n");
 		List<Bson> filtros = new ArrayList();
-		//filtros.add(match(gte("fecha", desde)));
-		//filtros.add(match(lte("fecha", hasta)));
+		filtros.add(match(gte("fecha", desde)));
+		filtros.add(match(lte("fecha", hasta)));
 		filtros.add(group("$cliente.dni", sum("total","$total"), first("Cliente", "$cliente")));
 		rankingCliente(filtros, "monto total");
 	}
@@ -140,8 +140,8 @@ public class Consultas {
 	private static void consulta8(Date desde, Date hasta) {
 		System.out.println("\n8. Ranking de clientes por compras, total de la cadena y por sucursal, entre fechas, por cantidad vendida.\n");
 		List<Bson> filtros = new ArrayList();
-		//filtros.add(match(gte("fecha", desde)));
-		//filtros.add(match(lte("fecha", hasta)));
+		filtros.add(match(gte("fecha", desde)));
+		filtros.add(match(lte("fecha", hasta)));
 		filtros.add(group("$cliente.dni", sum("total", 1), first("Cliente", "$cliente")));
 		rankingCliente(filtros, "cantidad");
 	}
@@ -324,6 +324,7 @@ public class Consultas {
 		List<Sucursal> sucursales = getSucursales(db);
 		
 	    ObjectMapper mapper = new ObjectMapper();
+	    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	    
 	    filtros.add(project(fields(excludeId())));
 	    float totalCadena = 0;

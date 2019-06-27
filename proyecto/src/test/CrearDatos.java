@@ -42,6 +42,8 @@ public class CrearDatos {
 			List<String> calles = new ArrayList<>(Arrays.asList("Belgrano", "Av. 12", "Callao", "Jujuy", "Pueyrredón", "Entre Ríos", "Rivadavia", "Portela"));
 			List<String> localidades = new ArrayList<>(Arrays.asList("Glew", "Longchamps", "Burzaco", "Adrogue", "Temperley", "Lomas de Zamora", "CABA"));
 			List<Integer> lstdni = new ArrayList<>(Arrays.asList(13860074,16166480,17275296,21637472,22897364,22908276,23965733,25663395,26199914,29326389,30259082,30998989,31541447,32608788,34948474,40232066,41385897,46199776,48502480,50655101,51375110,52205322,93049214,94585322,94603443,94749071,94753202,96913752));
+			List<String> perfume = new ArrayList<>(Arrays.asList("Paula Cahen D'anvers", "Cocot", "Ciel", "Tascani", "Dior"));
+			List<String> medicamento = new ArrayList<>(Arrays.asList("Salbutamol", "Omeprazol", "Ramipril", "Lansoprazol", "Loratadina", "Desoximetasona", "Esomeprazol", "Triazolam", "Sulfisoxazol", "Propafenona", "Oxacilina"));
 			
 			
 			
@@ -116,11 +118,13 @@ public class CrearDatos {
 			System.out.print("Cargando medicamentos y perfumeria... ");
 			for(int i = 0; i < medicamentos + perfumeria; i ++) {
 				int codigo = i;
-				String desc = "Perfume" + i;
-				String tipo = "Perfumeria";
+				String desc, tipo = "";
 				if (i < medicamentos) {
-					desc = "Medicamento" + i;
+					desc = medicamento.remove(rand.nextInt(medicamento.size()));
 					tipo = "Medicamento";
+				}else {
+					desc = perfume.remove(rand.nextInt(perfume.size()));
+					tipo = "Perfumeria";
 				}
 				String laboratorio = "Lab";
 				float precio = round((float) (rand.nextInt(150) + rand.nextDouble() + 50), 2);
