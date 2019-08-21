@@ -11,10 +11,6 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
 public class MongoDateSerializer extends JsonSerializer<Date>{
-    /*public void serialize(Date date, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-    	jgen.writeRaw("ISODATE(\"" + isoDate + "\")");
-    }
-    */
     public void serialize(Date date, JsonGenerator jgen, SerializerProvider provider) throws IOException {
     	TimeZone tz = TimeZone.getTimeZone("UTC");
     	DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
